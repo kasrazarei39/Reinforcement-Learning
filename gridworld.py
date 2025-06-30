@@ -85,7 +85,7 @@ class GridWorld:
         self.position = self.start
 
     def evaluate_policy(self, gamma: float = 1.0, threshold: float = 1e-4, 
-                       verbose: bool = True) -> int:
+                       verbose: bool = True, visualize: bool = False) -> int:
         """
         Evaluate the current policy using iterative policy evaluation.
         
@@ -93,10 +93,19 @@ class GridWorld:
             gamma: Discount factor
             threshold: Convergence threshold
             verbose: Whether to print iteration details
+            visualize: Whether to show value matrix visualization each iteration
             
         Returns:
             Number of iterations until convergence
         """
+        # Import visualization function if needed
+        if visualize:
+            try:
+                from visualization import plot_value_matrix_iteration
+            except ImportError:
+                print("Warning: visualization module not available. Setting visualize=False")
+                visualize = False
+        
         iteration = 0
         
         while True:
@@ -124,6 +133,9 @@ class GridWorld:
                 print(f"\nIteration {iteration} - Max Delta: {delta:.6f}")
                 for r in self.value:
                     print(['{:.2f}'.format(v) for v in r])
+            
+            if visualize:
+                plot_value_matrix_iteration(self.value, iteration, self.N)
 
             if delta < threshold:
                 if verbose:

@@ -28,9 +28,14 @@ york/
    python main.py
    ```
 
-3. **Run a simple demo:**
+3. **Run visualization demo:**
    ```bash
-   python main.py --simple
+   python main.py --visualization
+   ```
+
+4. **Run iterative visualization demo:**
+   ```bash
+   python main.py --iterative
    ```
 
 ## 📚 Module Overview
@@ -75,17 +80,16 @@ Provides various visualization options:
 ### `examples.py`
 Contains example configurations:
 - Main 6x6 grid world example
-- Simple 3x3 grid world for testing
 - Factory functions for easy environment creation
 
 **Key Functions:**
 - `create_example_gridworld()` - Create main example
-- `create_simple_gridworld()` - Create simple test example
 
 ### `main.py`
-Main execution script with two modes:
+Main execution script with multiple modes:
 - Full demonstration with all features
-- Simple demonstration for quick testing
+- Visualization options demo
+- Iterative value matrix visualization demo
 
 ## 🎯 Features
 
@@ -95,6 +99,7 @@ Main execution script with two modes:
 - **Multiple Visualization Options**: Text, heatmap, and animation
 - **Performance Analysis**: Built-in metrics and analysis
 - **Flexible Configuration**: Easy to create custom environments
+- **Iterative Visualization**: Watch value matrix evolve during policy evaluation
 
 ## 🔧 Usage Examples
 
@@ -122,12 +127,23 @@ follow_policy(gw)
 from gridworld import GridWorld
 
 # Define your own configuration
-rewards = [[-1, -1, 10], [-1, -2, -1], [-1, -1, -1]]
-policy = [['E', 'E', 'E'], ['E', 'E', 'E'], ['E', 'E', 'E']]
+rewards = [[-1, -1, -1, 10], [-1, -2, -1, -1], [-1, -1, -2, -1], [-1, -1, -1, -1]]
+policy = [['E', 'E', 'E', 'E'], ['E', 'E', 'E', 'E'], ['E', 'E', 'E', 'E'], ['E', 'E', 'E', 'E']]
 
 # Create custom grid world
-gw = GridWorld(N=3, rewards=rewards, policy=policy, 
-               start=(2, 0), terminal=(0, 2))
+gw = GridWorld(N=4, rewards=rewards, policy=policy, 
+               start=(3, 0), terminal=(0, 3))
+```
+
+### Iterative Visualization
+```python
+from examples import create_example_gridworld
+
+# Create environment
+gw = create_example_gridworld()
+
+# Evaluate policy with visualization
+gw.evaluate_policy(visualize=True)
 ```
 
 ## 📊 Output Examples
@@ -140,6 +156,7 @@ The system provides multiple types of output:
 4. **Performance Metrics**: Path length, total reward, efficiency
 5. **Animated Visualization**: Real-time agent movement
 6. **Heatmap**: Color-coded value matrix
+7. **Iterative Visualization**: Value matrix evolution during evaluation
 
 ## 🛠️ Development
 
@@ -162,4 +179,4 @@ The modular structure makes it easy to contribute:
 1. Add new features to appropriate modules
 2. Maintain type hints and documentation
 3. Follow the existing code style
-4. Test with both example configurations 
+4. Test with the example configuration 

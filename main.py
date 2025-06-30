@@ -25,7 +25,7 @@ def main():
     
     # Evaluate the policy
     print("\n🧮 Evaluating policy...")
-    iterations = gw.evaluate_policy(gamma=1.0, threshold=1e-4, verbose=True)
+    iterations = gw.evaluate_policy(gamma=1.0, threshold=1e-4, verbose=False, visualize=True)
     
     # Display results
     print_value_matrix(gw)
@@ -50,31 +50,6 @@ def main():
     show_both_visualizations(gw)
     
     print("\n✅ Demo completed!")
-
-
-def run_simple_demo():
-    """Run a simple demonstration with minimal output."""
-    print("🚀 Simple GridWorld Demo")
-    print("=" * 30)
-    
-    from examples import create_simple_gridworld
-    
-    # Create simple 3x3 grid world
-    gw = create_simple_gridworld()
-    
-    # Evaluate policy
-    gw.evaluate_policy(verbose=False)
-    
-    # Show results
-    print_value_matrix(gw)
-    visualize_path(gw)
-    
-    # Follow policy
-    follow_policy(gw, verbose=True)
-    
-    # Show visualizations in sequence
-    print("\n📊🎬 Showing visualizations in sequence...")
-    show_visualizations_sequence(gw, delay=2.0)
 
 
 def run_visualization_demo():
@@ -109,16 +84,40 @@ def run_visualization_demo():
         show_both_visualizations(gw)
 
 
+def run_iterative_visualization_demo():
+    """Run a demo showing value matrix visualization during policy evaluation."""
+    print("🎬 Iterative Value Matrix Visualization Demo")
+    print("=" * 50)
+    
+    from examples import create_example_gridworld
+    
+    print("\n📊 Running policy evaluation with 6x6 grid...")
+    gw = create_example_gridworld()
+    
+    print("\n🎬 Watch the value matrix evolve during policy evaluation!")
+    print("Each iteration will show a new heatmap visualization.")
+    print("Press any key to continue...")
+    input()
+    
+    # Evaluate policy with visualization enabled
+    iterations = gw.evaluate_policy(gamma=1.0, threshold=1e-4, 
+                                   verbose=True, visualize=True)
+    
+    print(f"\n✅ Policy evaluation completed in {iterations} iterations!")
+    print("\n🎯 Final value matrix:")
+    print_value_matrix(gw)
+
+
 if __name__ == "__main__":
     import sys
     
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--simple":
-            run_simple_demo()
-        elif sys.argv[1] == "--visualization":
+        if sys.argv[1] == "--visualization":
             run_visualization_demo()
+        elif sys.argv[1] == "--iterative":
+            run_iterative_visualization_demo()
         else:
-            print("Usage: python main.py [--simple|--visualization]")
+            print("Usage: python main.py [--visualization|--iterative]")
             main()
     else:
         main() 

@@ -239,4 +239,43 @@ def show_visualizations_sequence(grid_world, delay: float = 3.0) -> None:
     
     # Show agent path animation
     print("🎬 Showing agent path animation...")
-    animate_agent_path(grid_world) 
+    animate_agent_path(grid_world)
+
+
+def plot_value_matrix_iteration(value_matrix: List[List[float]], iteration: int, 
+                               grid_size: int, block: bool = False) -> None:
+    """
+    Create a heatmap visualization of the value matrix for a specific iteration.
+    
+    Args:
+        value_matrix: 2D list representing the value matrix
+        iteration: Current iteration number
+        grid_size: Size of the grid (N)
+        block: Whether to block execution while showing the plot
+    """
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    # Create heatmap
+    im = ax.imshow(value_matrix, cmap='RdYlBu_r', aspect='equal')
+    
+    # Add text annotations
+    for i in range(grid_size):
+        for j in range(grid_size):
+            text = ax.text(j, i, f'{value_matrix[i][j]:.1f}',
+                          ha="center", va="center", color="black", fontweight='bold')
+    
+    # Customize plot
+    ax.set_xticks(range(grid_size))
+    ax.set_yticks(range(grid_size))
+    ax.set_title(f"Value Matrix - Iteration {iteration}", fontsize=14, fontweight='bold')
+    ax.set_xlabel("Column", fontsize=12)
+    ax.set_ylabel("Row", fontsize=12)
+    
+    # Add colorbar
+    cbar = plt.colorbar(im, ax=ax)
+    cbar.set_label("Value", fontsize=12)
+    
+    plt.tight_layout()
+    plt.show(block=block)
+    plt.pause(0.5)  # Pause briefly to show the plot
+    plt.close()  # Close the plot to avoid memory issues 
