@@ -1,19 +1,18 @@
 # GridWorld Reinforcement Learning
 
-A modular implementation of a grid world environment for reinforcement learning, featuring policy evaluation, agent movement, and visualization capabilities.
+A modular implementation of a grid world environment for reinforcement learning, featuring policy evaluation, policy iteration, and comprehensive visualization capabilities.
 
 ## 🏗️ Project Structure
 
 ```
-york/
+Reinforcement-Learning/
 ├── gridworld.py      # Core GridWorld environment class
-├── agent.py          # Agent behavior and policy following
+├── agent.py          # Agent behavior and policy analysis
 ├── visualization.py  # Plotting and animation functions
 ├── examples.py       # Example configurations and setups
 ├── main.py          # Main execution script
 ├── requirements.txt  # Project dependencies
-├── README.md        # This file
-└── RL.py           # Original monolithic script (legacy)
+└── README.md        # This file
 ```
 
 ## 🚀 Quick Start
@@ -23,33 +22,25 @@ york/
    pip install -r requirements.txt
    ```
 
-2. **Run the main demonstration:**
+2. **Run the policy iteration demonstration:**
    ```bash
    python main.py
-   ```
-
-3. **Run visualization demo:**
-   ```bash
-   python main.py --visualization
-   ```
-
-4. **Run iterative visualization demo:**
-   ```bash
-   python main.py --iterative
    ```
 
 ## 📚 Module Overview
 
 ### `gridworld.py`
 The core environment class that implements:
-- Grid-based world with customizable size
+- Grid-based world with customizable size (6×6 default)
 - Movement in four directions (N, S, E, W)
-- Reward system
+- Reward system with negative costs and positive goal reward
 - Policy evaluation using iterative methods
+- Policy iteration for finding optimal policies
 - Value function computation
 
 **Key Methods:**
-- `evaluate_policy()` - Iterative policy evaluation
+- `evaluate_policy()` - Iterative policy evaluation with visualization support
+- `calculate_new_policy()` - Policy iteration (evaluation + improvement)
 - `action()` - Execute an action and get reward
 - `move()` - Calculate new position after movement
 - `reset()` - Reset agent to starting position
@@ -66,40 +57,44 @@ Handles agent behavior and policy analysis:
 - `calculate_total_reward()` - Compute total reward for a policy
 
 ### `visualization.py`
-Provides various visualization options:
+Provides comprehensive visualization options:
 - Text-based path visualization
 - Animated agent movement
 - Value matrix heatmaps
-- Formatted value matrix printing
+- Iterative value matrix visualization during policy evaluation
+- Side-by-side visualizations
 
 **Key Functions:**
+- `plot_value_matrix_iteration()` - Show value matrix evolution
 - `animate_agent_path()` - Create animated visualization
 - `plot_value_matrix()` - Generate heatmap of values
 - `visualize_path()` - Text-based path display
+- `show_both_visualizations()` - Combined heatmap and animation
 
 ### `examples.py`
-Contains example configurations:
-- Main 6x6 grid world example
-- Factory functions for easy environment creation
+Contains the main grid world configuration:
+- 6×6 grid world with challenging reward structure
+- Factory function for easy environment creation
 
 **Key Functions:**
-- `create_example_gridworld()` - Create main example
+- `create_example_gridworld()` - Create main example environment
 
 ### `main.py`
-Main execution script with multiple modes:
-- Full demonstration with all features
-- Visualization options demo
-- Iterative value matrix visualization demo
+Main execution script featuring:
+- Complete policy iteration demonstration
+- Three-step workflow: initial policy → policy improvement → optimal policy
+- Comprehensive analysis and visualization
 
 ## 🎯 Features
 
+- **Policy Iteration Demo**: Complete workflow from initial to optimal policy
+- **Interactive Visualization**: Watch value matrices evolve during evaluation
+- **Performance Analysis**: Compare policy performance before and after improvement
 - **Modular Design**: Clean separation of concerns
 - **Type Hints**: Full type annotation for better code quality
 - **Comprehensive Documentation**: Detailed docstrings for all functions
 - **Multiple Visualization Options**: Text, heatmap, and animation
-- **Performance Analysis**: Built-in metrics and analysis
-- **Flexible Configuration**: Easy to create custom environments
-- **Iterative Visualization**: Watch value matrix evolve during policy evaluation
+- **Real-time Learning**: See algorithms converge step-by-step
 
 ## 🔧 Usage Examples
 
@@ -122,6 +117,23 @@ print_value_matrix(gw)
 follow_policy(gw)
 ```
 
+### Policy Iteration
+```python
+from examples import create_example_gridworld
+
+# Create environment
+gw = create_example_gridworld()
+
+# Evaluate initial policy
+gw.evaluate_policy(visualize=True)
+
+# Find optimal policy
+gw.calculate_new_policy(verbose=True)
+
+# Evaluate optimal policy
+gw.evaluate_policy(visualize=True)
+```
+
 ### Custom Environment
 ```python
 from gridworld import GridWorld
@@ -135,17 +147,6 @@ gw = GridWorld(N=4, rewards=rewards, policy=policy,
                start=(3, 0), terminal=(0, 3))
 ```
 
-### Iterative Visualization
-```python
-from examples import create_example_gridworld
-
-# Create environment
-gw = create_example_gridworld()
-
-# Evaluate policy with visualization
-gw.evaluate_policy(visualize=True)
-```
-
 ## 📊 Output Examples
 
 The system provides multiple types of output:
@@ -157,6 +158,28 @@ The system provides multiple types of output:
 5. **Animated Visualization**: Real-time agent movement
 6. **Heatmap**: Color-coded value matrix
 7. **Iterative Visualization**: Value matrix evolution during evaluation
+8. **Policy Comparison**: Before/after policy improvement analysis
+
+## 🔄 Policy Iteration Workflow
+
+The main demonstration follows a three-step process:
+
+### Step 1: Initial Policy Analysis
+- Create GridWorld environment with default policy
+- Evaluate policy using iterative policy evaluation
+- Display value matrix and performance metrics
+- Show agent path visualization and animation
+
+### Step 2: Policy Improvement
+- Run policy iteration algorithm
+- Find optimal policy through evaluation and improvement cycles
+- Show convergence process with iteration details
+
+### Step 3: Optimal Policy Analysis
+- Evaluate the new optimal policy
+- Compare performance metrics with initial policy
+- Visualize improved agent behavior
+- Demonstrate efficiency gains
 
 ## 🛠️ Development
 
@@ -179,4 +202,17 @@ The modular structure makes it easy to contribute:
 1. Add new features to appropriate modules
 2. Maintain type hints and documentation
 3. Follow the existing code style
-4. Test with the example configuration 
+4. Test with the example configuration
+
+## 🎓 Educational Value
+
+This project demonstrates key reinforcement learning concepts:
+
+- **Markov Decision Processes (MDPs)**: States, actions, rewards, transitions
+- **Policy Evaluation**: Computing value functions for given policies
+- **Policy Iteration**: Finding optimal policies through evaluation and improvement
+- **Bellman Equations**: Value function updates
+- **Convergence Properties**: Algorithm termination conditions
+- **Performance Analysis**: Comparing different policies
+
+Perfect for understanding fundamental RL algorithms and their practical implementation! 
