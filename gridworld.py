@@ -181,4 +181,57 @@ class GridWorld:
             True if position is valid, False otherwise
         """
         row, col = position
-        return 0 <= row < self.N and 0 <= col < self.N 
+        return 0 <= row < self.N and 0 <= col < self.N
+
+    def calculate_new_policy(self, gamma=1.0, threshold=1e-4, verbose=True):
+        actions = ['N', 'S', 'E', 'W']
+        new_policy = [[None for _ in range(self.N)] for _ in range(self.N)]
+        iteration = 0
+
+        while True:
+            delta = 0
+            new_value = [[0 for _ in range(self.N)] for _ in range(self.N)]
+            new_value[self.terminal[0]][self.terminal[1]] = self.rewards[self.terminal[0]][self.terminal[1]]
+
+            for row in range(self.N):
+                for col in range(self.N):
+                    if (row, col) == self.terminal:
+                        continue
+
+                    best_value = float('-inf')
+                    best_action = None
+
+                    for action in actions:
+                        next_row, next_col = self.move(action, row, col)
+
+                        if (next_row, next_col) == (row, col):
+                            reward = self.rewards[row][col]
+                        else:
+                            reward = self.rewards[next_row][next_col]
+
+                        val = reward + gamma * self.value[next_row][next_col]
+
+                        if val > best_value:
+                            best_value = val
+                            best_action = action
+
+                    new_value[row][col] = best_value
+                    new_policy[row][col] = best_action
+                    delta = max(delta, abs(self.value[row][col] - best_value))
+
+            self.value = new_value
+            self.policy = new_policy
+            iteration += 1
+
+            if verbose:
+                print(f"\nIteration {iteration} - Max Delta: {delta:.6f}")
+                for r in self.value:
+                    print(['{:.2f}'.format(v) for v in r])
+
+            if delta < threshold:
+                print(f"\n✅ Converged in {iteration} iterations.")
+                break
+
+        print("\nOptimal Policy:")
+        for row in self.policy:
+            print(row)

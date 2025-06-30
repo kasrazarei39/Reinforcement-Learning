@@ -14,110 +14,86 @@ from visualization import (
 )
 
 
-def main():
+def main(gw=None, policy_name="Current"):
     """Main function to run the GridWorld demonstration."""
-    print("🚀 GridWorld Reinforcement Learning Demo")
-    print("=" * 50)
+    print(f"🚀 GridWorld Reinforcement Learning Demo - {policy_name} Policy")
+    print("=" * 60)
     
-    # Create the grid world environment
-    print("\n📋 Creating GridWorld environment...")
-    gw = create_example_gridworld()
+    # Create the grid world environment if not provided
+    if gw is None:
+        print("\n📋 Creating GridWorld environment...")
+        gw = create_example_gridworld()
     
     # Evaluate the policy
-    print("\n🧮 Evaluating policy...")
+    print(f"\n🧮 Evaluating {policy_name.lower()} policy...")
     iterations = gw.evaluate_policy(gamma=1.0, threshold=1e-4, verbose=False, visualize=True)
     
     # Display results
     print_value_matrix(gw)
     
     # Analyze policy performance
-    print("\n📊 Analyzing policy performance...")
+    print(f"\n📊 Analyzing {policy_name.lower()} policy performance...")
     performance = analyze_policy_performance(gw)
     print(f"Path length: {performance['path_length']} steps")
     print(f"Total reward: {performance['total_reward']:.2f}")
     print(f"Efficiency: {performance['efficiency']:.2f} reward/step")
     
     # Follow policy step by step
-    print("\n👟 Following policy step by step...")
+    print(f"\n👟 Following {policy_name.lower()} policy step by step...")
     follow_policy(gw, verbose=True)
     
     # Visualize the path
-    print("\n🗺️  Visualizing agent path...")
+    print(f"\n🗺️  Visualizing {policy_name.lower()} policy path...")
     visualize_path(gw)
     
     # Show both visualizations side by side
-    print("\n📊🎬 Showing both value matrix and agent path animation...")
+    print(f"\n📊🎬 Showing both value matrix and {policy_name.lower()} policy path animation...")
     show_both_visualizations(gw)
     
-    print("\n✅ Demo completed!")
+    print(f"\n✅ {policy_name} policy demo completed!")
+    return gw
 
 
-def run_visualization_demo():
-    """Run a demo focused on different visualization options."""
-    print("🎨 Visualization Options Demo")
-    print("=" * 35)
+def run_policy_iteration_demo():
+    """Run a complete policy iteration demo: initial policy → new policy."""
+    print("🔄 Policy Iteration Demo")
+    print("=" * 40)
     
-    from examples import create_example_gridworld
+    # Step 1: Run with initial policy
+    print("\n" + "="*60)
+    print("STEP 1: Running with Initial Policy")
+    print("="*60)
     
-    # Create grid world
-    gw = create_example_gridworld()
-    gw.evaluate_policy(verbose=False)
+    gw = main(policy_name="Initial")
     
-    print("\nChoose visualization option:")
-    print("1. Value matrix heatmap only")
-    print("2. Agent path animation only")
-    print("3. Both visualizations side by side")
-    print("4. Visualizations in sequence")
+    # Step 2: Calculate new optimal policy
+    print("\n" + "="*60)
+    print("STEP 2: Calculating New Optimal Policy")
+    print("="*60)
     
-    choice = input("\nEnter your choice (1-4): ").strip()
-    
-    if choice == "1":
-        plot_value_matrix(gw)
-    elif choice == "2":
-        animate_agent_path(gw)
-    elif choice == "3":
-        show_both_visualizations(gw)
-    elif choice == "4":
-        show_visualizations_sequence(gw)
-    else:
-        print("Invalid choice. Showing both side by side.")
-        show_both_visualizations(gw)
-
-
-def run_iterative_visualization_demo():
-    """Run a demo showing value matrix visualization during policy evaluation."""
-    print("🎬 Iterative Value Matrix Visualization Demo")
-    print("=" * 50)
-    
-    from examples import create_example_gridworld
-    
-    print("\n📊 Running policy evaluation with 6x6 grid...")
-    gw = create_example_gridworld()
-    
-    print("\n🎬 Watch the value matrix evolve during policy evaluation!")
-    print("Each iteration will show a new heatmap visualization.")
+    print("\n🧠 Running policy iteration to find optimal policy...")
+    print("This will evaluate the current policy and improve it iteratively.")
     print("Press any key to continue...")
     input()
     
-    # Evaluate policy with visualization enabled
-    iterations = gw.evaluate_policy(gamma=1.0, threshold=1e-4, 
-                                   verbose=True, visualize=True)
+    gw.calculate_new_policy(gamma=1.0, threshold=1e-4, verbose=True)
     
-    print(f"\n✅ Policy evaluation completed in {iterations} iterations!")
-    print("\n🎯 Final value matrix:")
-    print_value_matrix(gw)
+    # Step 3: Run with new policy
+    print("\n" + "="*60)
+    print("STEP 3: Running with New Optimal Policy")
+    print("="*60)
+    
+    main(gw, policy_name="Optimal")
+    
+    print("\n" + "="*60)
+    print("🎯 Policy Iteration Demo Completed!")
+    print("="*60)
+    print("Summary:")
+    print("- Step 1: Evaluated and analyzed the initial policy")
+    print("- Step 2: Calculated the optimal policy using policy iteration")
+    print("- Step 3: Evaluated and analyzed the optimal policy")
+    print("="*60)
 
 
 if __name__ == "__main__":
-    import sys
-    
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "--visualization":
-            run_visualization_demo()
-        elif sys.argv[1] == "--iterative":
-            run_iterative_visualization_demo()
-        else:
-            print("Usage: python main.py [--visualization|--iterative]")
-            main()
-    else:
-        main() 
+    run_policy_iteration_demo()
