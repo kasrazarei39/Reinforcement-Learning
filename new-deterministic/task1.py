@@ -6,6 +6,7 @@ class GridWorldEvaluator:
         self.terminal = terminal
         self.gamma = gamma
         self.value = [[0.0 for _ in range(self.N)] for _ in range(self.N)]
+        # Set terminal state's value to its reward (goal)
         self.value[terminal[0]][terminal[1]] = rewards[terminal[0]][terminal[1]]
 
     def move(self, action, row, col):
@@ -17,7 +18,7 @@ class GridWorldEvaluator:
             return row, col - 1
         if action == 'E' and col < self.N - 1:
             return row, col + 1
-        return row, col  # no move if at boundary
+        return row, col  # No move if at edge
 
     def evaluate_policy(self, theta=1e-4, verbose=True):
         iteration = 0
@@ -26,18 +27,28 @@ class GridWorldEvaluator:
             for row in range(self.N):
                 for col in range(self.N):
                     if (row, col) == self.terminal:
-                        continue
+                        continue  # Do not update terminal
+
                     action = self.policy[row][col]
                     next_row, next_col = self.move(action, row, col)
+
                     reward = self.rewards[next_row][next_col]
-                    new_v = reward + self.gamma * self.value[next_row][next_col]
+
+                    # 🔒 If next is terminal, don't add future value
+                    if (next_row, next_col) == self.terminal:
+                        new_v = reward
+                    else:
+                        new_v = reward + self.gamma * self.value[next_row][next_col]
+
                     delta = max(delta, abs(self.value[row][col] - new_v))
                     self.value[row][col] = new_v
+
             iteration += 1
             if verbose:
                 print(f"\nIteration {iteration} — Δ = {delta:.6f}")
                 for row_vals in self.value:
                     print(['{:.2f}'.format(v) for v in row_vals])
+
             if delta < theta:
                 print(f"\n✅ Converged in {iteration} iterations.")
                 break
