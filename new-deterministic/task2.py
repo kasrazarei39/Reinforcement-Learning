@@ -31,7 +31,7 @@ class MonteCarloEvaluator:
             episode.append(((row, col), reward))
             row, col = next_row, next_col
 
-        episode.append((self.terminal, self.rewards[self.terminal[0]][self.terminal[1]]))
+        # Do NOT append the terminal state itself (no reward after terminal)
         return episode
 
     def evaluate_policy(self, episodes=500, verbose=False):
@@ -44,6 +44,8 @@ class MonteCarloEvaluator:
                     G = 0
                     for (state, reward) in reversed(episode):
                         r, c = state
+                        if (r, c) == self.terminal:
+                            continue  # Do not update terminal state
                         G = self.gamma * G + reward
                         self.counts[r][c] += 1
                         alpha = 1 / self.counts[r][c]
