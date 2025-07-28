@@ -9,6 +9,8 @@ class ValueIterationSolver:
         self.actions = ['N', 'S', 'E', 'W']
 
     def move(self, action, row, col):
+        if (row, col) == self.terminal:
+            return row, col  # 🚫 No transitions from terminal
         if action == 'N' and row > 0:
             return row - 1, col
         elif action == 'S' and row < self.N - 1:
@@ -17,7 +19,7 @@ class ValueIterationSolver:
             return row, col + 1
         elif action == 'W' and col > 0:
             return row, col - 1
-        return row, col  # stay in place if hitting boundary
+        return row, col  # hit wall
 
     def run_value_iteration(self, theta=1e-4, verbose=True):
         iteration = 0
@@ -27,7 +29,7 @@ class ValueIterationSolver:
             for row in range(self.N):
                 for col in range(self.N):
                     if (row, col) == self.terminal:
-                        new_value[row][col] = self.rewards[row][col]
+                        new_value[row][col] = self.rewards[row][col]  # ✅ Fixed terminal value
                         continue
 
                     best_value = float('-inf')
@@ -36,7 +38,11 @@ class ValueIterationSolver:
                     for action in self.actions:
                         next_row, next_col = self.move(action, row, col)
                         reward = self.rewards[next_row][next_col]
-                        val = reward + self.gamma * self.value[next_row][next_col]
+                        # ✅ Treat terminal as absorbing — no future value
+                        if (next_row, next_col) == self.terminal:
+                            val = reward  # Only immediate reward
+                        else:
+                            val = reward + self.gamma * self.value[next_row][next_col]
                         if val > best_value:
                             best_value = val
                             best_action = action
@@ -60,6 +66,7 @@ class ValueIterationSolver:
         print("\n🧭 Optimal Policy:")
         for row in self.policy:
             print(row)
+
 
 
 rewards = [
