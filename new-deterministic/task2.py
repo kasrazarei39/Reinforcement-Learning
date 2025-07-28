@@ -35,6 +35,7 @@ class MonteCarloEvaluator:
         return episode
 
     def evaluate_policy(self, episodes=500, verbose=False):
+        iteration = 0
         for ep in range(episodes):
             for row in range(self.N):
                 for col in range(self.N):
@@ -51,10 +52,11 @@ class MonteCarloEvaluator:
                         alpha = 1 / self.counts[r][c]
                         self.value[r][c] += alpha * (G - self.value[r][c])
 
-        if verbose:
-            print("\n📊 Final Value Estimates (Monte Carlo):")
-            for r in self.value:
-                print(['{:.2f}'.format(v) for v in r])
+            iteration += 1
+            if verbose:
+                print(f"\n📊 Iteration {iteration} Value Estimates (Monte Carlo):")
+                for r in self.value:
+                    print(['{:.2f}'.format(v) for v in r])
 
 
 
