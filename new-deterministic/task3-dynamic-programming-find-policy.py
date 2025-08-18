@@ -1,5 +1,5 @@
 class ValueIterationSolver:
-    def __init__(self, rewards, terminal, gamma=1.0):
+    def __init__(self, rewards, terminal, gamma=0.9):
         self.N = len(rewards)
         self.rewards = rewards
         self.terminal = terminal
@@ -54,10 +54,10 @@ class ValueIterationSolver:
             self.value = new_value
             iteration += 1
 
-            if verbose:
-                print(f"\nIteration {iteration} — Δ = {delta:.6f}")
-                for r in self.value:
-                    print(['{:.2f}'.format(v) for v in r])
+            # if verbose:
+            #     print(f"\nIteration {iteration} — Δ = {delta:.6f}")
+            #     for r in self.value:
+            #         print(['{:.2f}'.format(v) for v in r])
 
             if delta < theta:
                 print(f"\n✅ Converged in {iteration} iterations.")
