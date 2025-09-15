@@ -2,18 +2,18 @@ import numpy as np
 from collections import defaultdict
 import random
 
-class GridWorldMC:
-    def __init__(self, rewards, terminal=(5, 5), start=(0, 0), gamma=0.9, epsilon=0.1):
+class GridWorldTD:
+    def __init__(self, rewards, terminal=(5, 5), start=(0, 0), gamma=0.9, epsilon=0.1, alpha=0.1):
         self.n = rewards.shape[0]
         self.rewards = rewards
         self.terminal = terminal
         self.start = start
         self.gamma = gamma
         self.epsilon = epsilon
+        self.alpha = alpha
         self.actions = ['N', 'S', 'E', 'W']
 
         self.Q = defaultdict(lambda: {a: 0.0 for a in self.actions})
-        self.returns = defaultdict(list)
 
     def step(self, state, action):
         if state == self.terminal:
@@ -36,44 +36,32 @@ class GridWorldMC:
         q_values = self.Q[state]
         return max(q_values, key=q_values.get)
 
-    def generate_episode(self, max_steps=1000, random_start=False):
-        episode = []
-        if random_start:
-            state = (np.random.randint(self.n), np.random.randint(self.n))
-        else:
-            state = self.start
-        done = False
-        steps = 0
-        while not done and steps < max_steps:
-            action = self.epsilon_greedy(state)
-            next_state, reward, done = self.step(state, action)
-            episode.append((state, action, reward))
-            state = next_state
-            steps += 1
-        return episode, done
-
-    def train(self, episodes=50000, log_interval=5000):
+    def train(self, episodes=50000, max_steps=1000, log_interval=5000):
         goal_reached = 0
         returns_log = []
 
-        for ep in range(1, episodes+1):
-            episode, reached = self.generate_episode(max_steps=1000, random_start=True)
-            G = 0
-            visited = set()
+        for ep in range(1, episodes + 1):
+            state = self.start
+            done = False
+            total_return = 0
+            steps = 0
 
-            if reached:
+            while not done and steps < max_steps:
+                action = self.epsilon_greedy(state)
+                next_state, reward, done = self.step(state, action)
+
+                # TD(0) update
+                best_next_action = max(self.Q[next_state], key=self.Q[next_state].get)
+                td_target = reward + self.gamma * self.Q[next_state][best_next_action]
+                td_error = td_target - self.Q[state][action]
+                self.Q[state][action] += self.alpha * td_error
+
+                total_return += reward
+                state = next_state
+                steps += 1
+
+            if done:
                 goal_reached += 1
-
-            # Compute returns backward
-            for state, action, reward in reversed(episode):
-                G = self.gamma * G + reward
-                if (state, action) not in visited:
-                    self.returns[(state, action)].append(G)
-                    self.Q[state][action] = np.mean(self.returns[(state, action)])
-                    visited.add((state, action))
-
-            # Track episode return
-            total_return = sum([r for (_,_,r) in episode])
             returns_log.append(total_return)
 
             # Decay epsilon
@@ -84,7 +72,7 @@ class GridWorldMC:
                 avg_return = np.mean(returns_log[-log_interval:])
                 success_rate = goal_reached / log_interval * 100
                 print(f"Episode {ep}: avg_return={avg_return:.2f}, success_rate={success_rate:.1f}%, epsilon={self.epsilon:.3f}")
-                goal_reached = 0  # reset counter
+                goal_reached = 0
 
     def extract_policy(self):
         policy = {}
@@ -116,7 +104,7 @@ rewards = np.array([
     [-1, -4, -8, -6, -4, 10]
 ])
 
-env = GridWorldMC(rewards, terminal=(5,5), start=(5,0))
+env = GridWorldTD(rewards, terminal=(5,5), start=(5,0), alpha=0.1)
 env.train(episodes=100000, log_interval=5000)
 
 policy = env.extract_policy()
